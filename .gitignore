@@ -1,6 +1,8 @@
 .env
 /original_song/learned/*
 /original_song/to_learn/*
+!/original_song/to_learn/test.txt
 /output/learned/*
 /output/to_learn/*
+!/output/to_learn/test_analysis.txt
 /.vscode

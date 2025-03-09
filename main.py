@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import os
 import re
+import time
 
 # 加载环境变量
 load_dotenv()
@@ -49,6 +50,7 @@ def analyze_lyrics_batch(batch):
                 {'role': 'user', 'content': f"""请按照上述要求逐句分析以下歌词：\n{lyrics}"""}
             ]
         )
+        time.sleep(0.5)
         analysis = response.choices[0].message.content.strip()
         
         # 清理不必要的结尾语句
@@ -83,48 +85,65 @@ def remove_unwanted_endings(text):
 # 主函数
 def main():
     """
-    主程序：读取 original_song 文件夹中的所有歌词文件，逐个生成分析结果文件。
+    主程序：读取 original_song 文件夹及其子文件夹中的所有歌词文件，逐个生成分析结果文件。
     如果 output 文件夹中已存在对应的 _analysis.txt 文件，则跳过处理。
     """
-    # 获取 original_song 文件夹中的所有 .txt 文件
+    # 定义输入和输出文件夹
     input_folder = "original_song"
     output_folder = "output"
-    song_files = [f for f in os.listdir(input_folder) if f.endswith(".txt")]
 
-    # 遍历每个歌词文件
-    for song_file in song_files:
-        input_file = os.path.join(input_folder, song_file)
-        output_file = os.path.join(output_folder, f"{os.path.splitext(song_file)[0]}_analysis.txt")
+    # 支持的子文件夹列表
+    subfolders = ["to_learn", "learned"]
 
-        # 检查输出文件是否已存在
-        if os.path.exists(output_file):
-            print(f"Skipping {song_file} (already processed)")
+    # 遍历每个子文件夹
+    for subfolder in subfolders:
+        input_subfolder = os.path.join(input_folder, subfolder)
+        output_subfolder = os.path.join(output_folder, subfolder)
+
+        # 确保输出子文件夹存在
+        os.makedirs(output_subfolder, exist_ok=True)
+
+        # 获取子文件夹中的所有 .txt 文件
+        if os.path.exists(input_subfolder):
+            song_files = [f for f in os.listdir(input_subfolder) if f.endswith(".txt")]
+        else:
+            print(f"Skipping {subfolder} (folder does not exist)")
             continue
 
-        print(f"Processing {song_file}...")
+        # 遍历每个歌词文件
+        for song_file in song_files:
+            input_file = os.path.join(input_subfolder, song_file)
+            output_file = os.path.join(output_subfolder, f"{os.path.splitext(song_file)[0]}_analysis.txt")
 
-        # 读取歌词文件
-        with open(input_file, 'r', encoding='utf-8') as f:
-            lyrics = f.readlines()
-        lyrics = [line.strip() for line in lyrics if line.strip()]  # 去除空行
+            # 检查输出文件是否已存在
+            if os.path.exists(output_file):
+                print(f"Skipping {song_file} in {subfolder} (already processed)")
+                continue
 
-        # 分段处理歌词
-        batches = process_lyrics_in_batches(lyrics, batch_size=4)
+            print(f"Processing {song_file} in {subfolder}...")
 
-        # 保存解析结果
-        with open(output_file, 'w', encoding='utf-8') as f:
-            for i, batch in enumerate(batches, start=1):
-                print(f"Processing batch {i} of {song_file}...")
-                analysis = analyze_lyrics_batch(batch)
-                
-                # 打印结果
-                print(f"\nBatch {i} Analysis:\n{analysis}\n")
-                
-                # 写入文件
-                f.write(analysis)
-                f.write("\n\n")  # 每批之间留空行
+            # 读取歌词文件
+            with open(input_file, 'r', encoding='utf-8') as f:
+                lyrics = f.readlines()
+            lyrics = [line.strip() for line in lyrics if line.strip()]  # 去除空行
 
-        print(f"Analysis completed and saved to {output_file}")
+            # 分段处理歌词
+            batches = process_lyrics_in_batches(lyrics, batch_size=4)
+
+            # 保存解析结果
+            with open(output_file, 'w', encoding='utf-8') as f:
+                for i, batch in enumerate(batches, start=1):
+                    print(f"Processing batch {i} of {song_file}...")
+                    analysis = analyze_lyrics_batch(batch)
+                    
+                    # 打印结果
+                    print(f"\nBatch {i} Analysis:\n{analysis}\n")
+                    
+                    # 写入文件
+                    f.write(analysis)
+                    f.write("\n\n")  # 每批之间留空行
+
+            print(f"Analysis completed and saved to {output_file}")
 
 # 运行主程序
 if __name__ == "__main__":

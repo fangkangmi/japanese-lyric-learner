@@ -11,7 +11,8 @@ client = OpenAI(
     base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
 )
 
-# 确保输出文件夹存在
+# 确保输入和输出文件夹存在
+os.makedirs("original_song", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
 # 定义分段处理函数
@@ -80,37 +81,51 @@ def remove_unwanted_endings(text):
     return text
 
 # 主函数
-def main(input_file, output_file):
+def main():
     """
-    主程序：读取歌词文件，分段处理并保存结果。
-    :param input_file: 输入歌词文件路径。
-    :param output_file: 输出解析结果文件路径。
+    主程序：读取 original_song 文件夹中的所有歌词文件，逐个生成分析结果文件。
+    如果 output 文件夹中已存在对应的 _analysis.txt 文件，则跳过处理。
     """
-    # 读取歌词文件
-    with open(input_file, 'r', encoding='utf-8') as f:
-        lyrics = f.readlines()
-    lyrics = [line.strip() for line in lyrics if line.strip()]  # 去除空行
+    # 获取 original_song 文件夹中的所有 .txt 文件
+    input_folder = "original_song"
+    output_folder = "output"
+    song_files = [f for f in os.listdir(input_folder) if f.endswith(".txt")]
 
-    # 分段处理歌词
-    batches = process_lyrics_in_batches(lyrics, batch_size=4)
+    # 遍历每个歌词文件
+    for song_file in song_files:
+        input_file = os.path.join(input_folder, song_file)
+        output_file = os.path.join(output_folder, f"{os.path.splitext(song_file)[0]}_analysis.txt")
 
-    # 保存解析结果
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for i, batch in enumerate(batches, start=1):
-            print(f"Processing batch {i}...")
-            analysis = analyze_lyrics_batch(batch)
-            
-            # 打印结果
-            print(f"\nBatch {i} Analysis:\n{analysis}\n")
-            
-            # 写入文件
-            f.write(analysis)
-            f.write("\n\n")  # 每批之间留空行
+        # 检查输出文件是否已存在
+        if os.path.exists(output_file):
+            print(f"Skipping {song_file} (already processed)")
+            continue
 
-    print(f"Analysis completed and saved to {output_file}")
+        print(f"Processing {song_file}...")
+
+        # 读取歌词文件
+        with open(input_file, 'r', encoding='utf-8') as f:
+            lyrics = f.readlines()
+        lyrics = [line.strip() for line in lyrics if line.strip()]  # 去除空行
+
+        # 分段处理歌词
+        batches = process_lyrics_in_batches(lyrics, batch_size=4)
+
+        # 保存解析结果
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for i, batch in enumerate(batches, start=1):
+                print(f"Processing batch {i} of {song_file}...")
+                analysis = analyze_lyrics_batch(batch)
+                
+                # 打印结果
+                print(f"\nBatch {i} Analysis:\n{analysis}\n")
+                
+                # 写入文件
+                f.write(analysis)
+                f.write("\n\n")  # 每批之间留空行
+
+        print(f"Analysis completed and saved to {output_file}")
 
 # 运行主程序
 if __name__ == "__main__":
-    input_file = "original_song/dryflower.txt"  # 输入歌词文件路径
-    output_file = "output/dryflower_analysis.txt"  # 输出解析结果文件路径
-    main(input_file, output_file)
+    main()

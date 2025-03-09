@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
-import time
+import re
 
 # 加载环境变量
 load_dotenv()
@@ -34,6 +34,7 @@ def analyze_lyrics_batch(batch):
    - 每句歌词单独列出。
    - 翻译和语法解释分开。
    - 关键词汇和语法点用清晰的项目符号标注。
+4. 请严格按照要求逐句分析歌词，不要在分析结果的末尾添加任何总结性或额外的内容。
 '''
 
     # 预先处理歌词的换行连接
@@ -47,12 +48,36 @@ def analyze_lyrics_batch(batch):
                 {'role': 'user', 'content': f"""请按照上述要求逐句分析以下歌词：\n{lyrics}"""}
             ]
         )
-        time.sleep(1)  # 添加延迟以避免速率限制
-        return response.choices[0].message.content.strip()
+        analysis = response.choices[0].message.content.strip()
+        
+        # 清理不必要的结尾语句
+        analysis = remove_unwanted_endings(analysis)
+        return analysis
     except Exception as e:
         print(f"Error occurred while processing batch: {batch}")
         print(f"Error details: {e}")
         return "Error: Unable to process this batch."
+
+# 清理不必要的结尾语句
+def remove_unwanted_endings(text):
+    """
+    移除分析结果中的总结性或额外内容。
+    :param text: 原始分析结果。
+    :return: 清理后的分析结果。
+    """
+    # 定义需要移除的模式
+    patterns_to_remove = [
+        r"希望这些解析对你理解歌词有所帮助.*",  # 匹配总结性语句
+        r"如果有其他问题，随时提问哦.*",       # 匹配鼓励提问的语句
+        r"---\s*希望.*",                      # 匹配分割线后跟随的总结性内容
+    ]
+    
+    for pattern in patterns_to_remove:
+        text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+    
+    # 去除多余的空行
+    text = re.sub(r"\n\s*\n", "\n\n", text).strip()
+    return text
 
 # 主函数
 def main(input_file, output_file):
@@ -79,7 +104,6 @@ def main(input_file, output_file):
             print(f"\nBatch {i} Analysis:\n{analysis}\n")
             
             # 写入文件
-            f.write(f"Batch {i}:\n")
             f.write(analysis)
             f.write("\n\n")  # 每批之间留空行
 

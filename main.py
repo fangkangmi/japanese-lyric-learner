@@ -112,8 +112,7 @@ def remove_unwanted_endings(text):
     # 去除多余的空行
     text = re.sub(r"\n\s*\n", "\n\n", text).strip()
     return text
-
-# 主函数
+ # 主函数
 def main():
     """
     主程序：读取 original_song 文件夹及其子文件夹中的所有歌词文件，逐个生成分析结果文件。
@@ -123,8 +122,9 @@ def main():
     input_folder = "original_song"
     output_folder = "output"
 
-    # 支持的子文件夹列表
-    subfolders = ["to_learn", "learned"]
+    # 获取所有子文件夹（包括根文件夹）
+    subfolders = [d for d in os.listdir(input_folder) if os.path.isdir(os.path.join(input_folder, d))]
+    subfolders.append("")  # 添加根文件夹
 
     # 遍历每个子文件夹
     for subfolder in subfolders:

@@ -1,0 +1,4 @@
+{
+    "python.defaultInterpreterPath": "/home/fang/miniconda3/envs/open_api/bin/python",
+    "python.terminal.activateEnvironment": true
+}

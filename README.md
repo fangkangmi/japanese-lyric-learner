@@ -1,12 +1,12 @@
 # Lyric Learn
 
-Lyric Learn is a Python application designed to help users learn song lyrics. This README provides an overview of the project, how to set it up, and how to use it.
+Japanese Lyric Learner is a Python application designed to analyze Japanese song lyrics. It uses the OpenAI API to provide detailed translations and explanations of the lyrics.
 
 ## Features
 
-- Display song lyrics
-- Interactive learning mode
-- Progress tracking
+- Analyzes Japanese song lyrics in batches.
+- Provides accurate translations and detailed explanations of grammar and key vocabulary.
+- Saves the analysis results to output files.
 
 ## Requirements
 
@@ -16,62 +16,46 @@ Lyric Learn is a Python application designed to help users learn song lyrics. Th
 ## Installation
 
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/yourusername/lyric_learn.git
+    ```sh
+    git clone <repository-url>
+    cd japanese-lyric-learner
     ```
-2. Navigate to the project directory:
-    ```bash
-    cd lyric_learn
-    ```
-3. Install the required packages:
-    ```bash
+
+2. Install the required packages:
+    ```sh
     pip install -r requirements.txt
     ```
+3. Create a `.env` file in the root directory and add your OpenAI API key, model name, and base URL:
+    ```env
+    OPENAI_API_KEY=your_openai_api_key
+    MODEL_NAME=qwen-plus
+    BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+    ```
 
-## Setup
-
-1. Set up your API key in the environment variables:
-    ```bash
-    export API_KEY=your_api_key_here
-    2. If you want to use a different model, modify the `client` initialization in `main.py`:
-        ```python
-        client = OpenAI(
-            base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-        )
-        ```
-
-    ### Example Configurations
-
-    - **Using OpenAI**: No need to edit the base URL.
-        ```python
-        client = OpenAI()
-        ```
-
-    - **Using Another Model (e.g., DashScope)**:
-        ```python
-        client = OpenAI(
-            base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-        )
-        ```
-
-
+4. If you want to use the OpenAI GPT model, update your `.env` file as follows:
+    ```env
+    OPENAI_API_KEY=your_openai_api_key
+    MODEL_NAME=gpt-4o  # Default is gpt-3.5-turbo
+    BASE_URL=https://api.openai.com/v1  # Default OpenAI API URL
+    ```
 ## Usage
 
-Run the main script to start the application:
-```bash
-python main.py
-```
+1. Place your song lyrics in the `original_song/learned` or `original_song/to_learn` directories.
 
-## Project Structure
+2. Run the main script:
+    ```sh
+    python main.py
+    ```
 
-- `main.py`: The main script to run the application.
-- `requirements.txt`: List of required Python packages.
-- `README.md`: Project documentation.
+3. The analysis results will be saved in the `output/learned` or `output/to_learn` directories.
 
-## Contributing
+4. Run the main script to generate a test analysis file for reference:
+    ```sh
+    python main.py
+    ```
 
-Contributions are welcome! Please fork the repository and submit a pull request.
+    This will create a file named `test_analyze.txt` in the `output` directory, which you can use as a reference for the analysis results.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License.

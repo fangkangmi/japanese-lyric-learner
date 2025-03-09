@@ -7,9 +7,15 @@ import time
 # 加载环境变量
 load_dotenv()
 
+# 获取环境变量
+api_key = os.getenv("OPENAI_API_KEY")
+model_name = os.getenv("MODEL_NAME", "gpt-4o")  # 默认使用 gpt-3.5-turbo
+base_url = os.getenv("BASE_URL", "https://api.openai.com/v1")  # 默认使用 OpenAI 的 API URL
+
 # 初始化 OpenAI 客户端
 client = OpenAI(
-    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+    api_key=api_key,
+    base_url=base_url,
 )
 
 # 确保输入和输出文件夹存在
@@ -69,7 +75,7 @@ def analyze_lyrics_batch(batch):
     
     try:
         response = client.chat.completions.create(
-            model="qwen-plus",
+            model=model_name,
             messages=[
                 {'role': 'system', 'content': system_message},
                 {'role': 'user', 'content': f"""请按照上述要求逐句分析以下歌词：\n{lyrics}"""}

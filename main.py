@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
+import time
 
 # 加载环境变量
 load_dotenv()
@@ -8,8 +9,10 @@ load_dotenv()
 # 初始化 OpenAI 客户端
 client = OpenAI(
     base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-    api_key=os.getenv("OPENAI_API_KEY")  # 确保在 .env 文件中设置了 OPENAI_API_KEY
 )
+
+# 确保输出文件夹存在
+os.makedirs("output", exist_ok=True)
 
 # 定义分段处理函数
 def process_lyrics_in_batches(lyrics, batch_size=4):
@@ -36,14 +39,20 @@ def analyze_lyrics_batch(batch):
     # 预先处理歌词的换行连接
     lyrics = '\n'.join(batch)
     
-    response = client.chat.completions.create(
-        model="qwen-max",
-        messages=[
-            {'role': 'system', 'content': system_message},
-            {'role': 'user', 'content': f"""请按照上述要求逐句分析以下歌词：\n{lyrics}"""}
-        ]
-    )
-    return response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="qwen-plus",
+            messages=[
+                {'role': 'system', 'content': system_message},
+                {'role': 'user', 'content': f"""请按照上述要求逐句分析以下歌词：\n{lyrics}"""}
+            ]
+        )
+        time.sleep(1)  # 添加延迟以避免速率限制
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error occurred while processing batch: {batch}")
+        print(f"Error details: {e}")
+        return "Error: Unable to process this batch."
 
 # 主函数
 def main(input_file, output_file):
@@ -65,6 +74,11 @@ def main(input_file, output_file):
         for i, batch in enumerate(batches, start=1):
             print(f"Processing batch {i}...")
             analysis = analyze_lyrics_batch(batch)
+            
+            # 打印结果
+            print(f"\nBatch {i} Analysis:\n{analysis}\n")
+            
+            # 写入文件
             f.write(f"Batch {i}:\n")
             f.write(analysis)
             f.write("\n\n")  # 每批之间留空行

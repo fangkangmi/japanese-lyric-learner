@@ -35,7 +35,7 @@ Japanese Lyric Learner is a Python application designed to analyze Japanese song
 4. If you want to use the OpenAI GPT model, update your `.env` file as follows:
     ```env
     OPENAI_API_KEY=your_openai_api_key
-    MODEL_NAME=gpt-4o  # Default is gpt-3.5-turbo
+    MODEL_NAME=gpt-5
     BASE_URL=https://api.openai.com/v1  # Default OpenAI API URL
     ```
 ## Usage

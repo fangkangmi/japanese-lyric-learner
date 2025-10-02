@@ -56,16 +56,4 @@ Japanese Lyric Learner is a Python application designed to analyze Japanese song
     ```sh
     uv run main.py
     ```
-
-3. The analysis results will be saved in the `output/learned` or `output/to_learn` directories.
-
-4. Run the main script to generate a test analysis file for reference:
-    ```sh
-    python main.py
-    ```
-
-    This will create a file named `test_analyze.txt` in the `output` directory, which you can use as a reference for the analysis results.
-
-## License
-
-This project is licensed under the MIT License.
+This will create a file named `test_analyze.txt` in the `output` directory, which you can use as a reference for the analysis results.

@@ -10,10 +10,13 @@ Japanese Lyric Learner is a Python application designed to analyze Japanese song
 
 ## Requirements
 
-- Python 3.11.11
-- Required Python packages (listed in `requirements.txt`)
+- Python 3.11+
+- uv package manager (recommended) or pip
+- Required Python packages (listed in `pyproject.toml`)
 
 ## Installation
+
+### Using uv (recommended)
 
 1. Clone the repository:
     ```sh
@@ -21,30 +24,37 @@ Japanese Lyric Learner is a Python application designed to analyze Japanese song
     cd japanese-lyric-learner
     ```
 
-2. Install the required packages:
+2. Install uv if you haven't already:
     ```sh
-    pip install -r requirements.txt
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
-3. Create a `.env` file in the root directory and add your OpenAI API key, model name, and base URL:
+
+3. Install dependencies:
+    ```sh
+    uv sync
+    ```
+
+4. Create a `.env` file in the root directory and add your OpenAI API key, model name, and base URL:
     ```env
     OPENAI_API_KEY=your_openai_api_key
     MODEL_NAME=qwen-plus
     BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
     ```
 
-4. If you want to use the OpenAI GPT model, update your `.env` file as follows:
+5. If you want to use the OpenAI GPT model, update your `.env` file as follows:
     ```env
     OPENAI_API_KEY=your_openai_api_key
     MODEL_NAME=gpt-5
     BASE_URL=https://api.openai.com/v1  # Default OpenAI API URL
     ```
+
 ## Usage
 
 1. Place your song lyrics in the `original_song/learned` or `original_song/to_learn` directories.
 
 2. Run the main script:
     ```sh
-    python main.py
+    uv run main.py
     ```
 
 3. The analysis results will be saved in the `output/learned` or `output/to_learn` directories.

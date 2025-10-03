@@ -9,7 +9,7 @@ load_dotenv()
 
 # 获取环境变量
 api_key = os.getenv("OPENAI_API_KEY")
-model_name = os.getenv("MODEL_NAME", "gpt-4o")  # 默认使用 gpt-3.5-turbo
+model_name = os.getenv("MODEL_NAME", "gpt-5")  # 默认使用 gpt-5
 base_url = os.getenv("BASE_URL", "https://api.openai.com/v1")  # 默认使用 OpenAI 的 API URL
 
 # 初始化 OpenAI 客户端
